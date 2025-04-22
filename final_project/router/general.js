@@ -24,55 +24,90 @@ public_users.post("/register", (req,res) => {
   }
 });
 
+const getBooks = () => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve(books);
+    }, 1000);
+  });
+}
 // Get the book list available in the shop
 public_users.get('/',function (req, res) {
-  //Write your code here
-  return res.status(200).json(books);
+  getBooks().then(books => {
+    return res.status(200).json(books);
+  });
 });
 
 // Get book details based on ISBN
+const getBookByIsbn = (isbn) => {
+  return new Promise((resolve, reject) => {
+    let result;
+    if(isbn){
+      result = books[isbn];
+    }
+    setTimeout(() => {
+      resolve(result);
+    }, 1000);
+  })
+};
 public_users.get('/isbn/:isbn',function (req, res) {
-  //Write your code here
   let isbn = req.params?.isbn;
-  if(isbn){
-    let book = books[isbn];
+  getBookByIsbn(isbn).then(book => {
     if(book){
       return res.status(200).json(book);
+    } else {
+      return res.status(404).json({message: "Not found!"});
     }
-  }
-  return res.status(404).json({message: "Not found!"});
+  });
 });
   
 // Get book details based on author
-public_users.get('/author/:author',function (req, res) {
-  //Write your code here
-  let result = [];
-  let author = req.params?.author;
-  author = author.trim().toLowerCase();
-  if(author){
-    for (let [key, book] of Object.entries(books)) {
-      if(book.author && book.author != 'Unknown' &&  book.author.toLowerCase().indexOf(author) >= 0){
-        result.push(book);
+const getBookByAuthor = (author) => {
+  return new Promise((resolve, reject) => {
+    let result = [];
+    if(author){
+      for (let [key, book] of Object.entries(books)) {
+        if(book.author && book.author != 'Unknown' &&  book.author.toLowerCase().indexOf(author) >= 0){
+          result.push(book);
+        }
       }
     }
-  }
-  return res.status(200).json(result);
+    setTimeout(() => {
+      resolve(result);
+    }, 1000);
+  })
+};
+public_users.get('/author/:author',function (req, res) {
+  let author = req.params?.author;
+  author = author.trim().toLowerCase();
+  getBookByAuthor(author).then(books => {
+    return res.status(200).json(books);
+  });
 });
 
 // Get all books based on title
-public_users.get('/title/:title',function (req, res) {
-  //Write your code here
-  let result = [];
-  let title = req.params?.title;
-  title = title.trim().toLowerCase();
-  if(title){
-    for (let [key, book] of Object.entries(books)) {
-      if(book.title && book.title.toLowerCase().indexOf(title) >= 0){
-        result.push(book);
+const getBookByTitle = (title) => {
+  return new Promise((resolve, reject) => {
+    let result = [];
+    if(title){
+      for (let [key, book] of Object.entries(books)) {
+        if(book.title && book.title.toLowerCase().indexOf(title) >= 0){
+          result.push(book);
+        }
       }
     }
-  }
-  return res.status(200).json(result);
+    setTimeout(() => {
+      resolve(result);
+    }, 1000);
+  })
+};
+public_users.get('/title/:title',function (req, res) {
+  //Write your code here
+  let title = req.params?.title;
+  title = title.trim().toLowerCase();
+  getBookByTitle(title).then(books => {
+    return res.status(200).json(books);
+  });
 });
 
 //  Get book review
